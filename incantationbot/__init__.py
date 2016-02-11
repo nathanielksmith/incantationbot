@@ -64,6 +64,8 @@ def main():
     while len(result) == 0:
         result = ''.join(chain.generate_text()[0:length])
 
+    result = result.rstrip() + '!'
+
     print('tweeting...')
     print(result)
     try:
