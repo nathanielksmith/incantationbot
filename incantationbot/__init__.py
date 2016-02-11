@@ -13,24 +13,65 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from random import randint, shuffle
 import sys
 
 import tweepy
-import markovify
+from smarkov import Markov
 
-import incantationbot.secret as secret
+from secret import API_KEY, API_SECRET, ACCESS_TOKEN, ACCESS_SECRET
 
+names = ["cthulhu",
+         "nyarlathotep"
+         "yog sothoth",
+         "shuggoth",
+         "shub niggurath",
+         "yig",
+         "azathoth",
+         "dagon",
+         "kadath",
+         "ghatanothoa",
+         "ithaqua",
+         "hastur",
+         "mi go",
+         "gaunt",
+         "tsathoggua",
+         "yuggoth",
+         "ulthar",
+         "sarnath",
+         "zin",
+         "gug",
+         "pnath",
+         "sarkomand",
+         "nodens",
+         "bhole",]
 
 def main():
-    twitter_auth = tweepy.OAuthHandler(secret.API_KEY, secret.API_SECRET)
-    twitter_auth.set_access_token(secret.ACCESS_TOKEN, secret.ACCESS_SECRET)
+    twitter_auth = tweepy.OAuthHandler(API_KEY, API_SECRET)
+    twitter_auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
 
     twitter_client = tweepy.API(twitter_auth)
 
+    print("building model...")
 
+    shuffle(names)
+    text = ' '.join(names)
+    chain = Markov([text])
+
+    print("making sentence...")
+    length = randint(20, 35)
+    result = ''
+    while len(result) == 0:
+        result = ''.join(chain.generate_text()[0:length])
+
+    print('tweeting...')
+    print(result)
     try:
-        return twitter_client.update_status(status='TODO')
+        response = twitter_client.update_status(status=result)
+        print(response)
+        return response
     except tweepy.error.TweepError as e:
+        print(e)
         return e
 
 if __name__ == '__main__':
